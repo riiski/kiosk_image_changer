@@ -1,12 +1,27 @@
 <?php
 $directory = "img";
 $all_img = array_slice(scandir($directory), 2);
+$array_length = count($all_img);
 
 
+$myfile = fopen("number.txt", "r") or die("Unable to open file!");
+$index_number = fread($myfile,2);
+if ($array_length < $index_number)
+    $index_number = 0;
+if ($array_length == $index_number)
+    $index_number = 0;
+fclose($myfile);
 
-$img_loc = "img/LowVisions2023_EKRANUI 1080x1920-01-01.jpg";
+$img_loc = "img/".$all_img[$index_number];
 $image_url = '<img class="bg" src="'.$img_loc.'" />';
 
+$myfile = fopen("number.txt", "w") or die("Unable to open file!");
+if ($array_length <= $index_number)
+    $index_number = -1;
+$added_number = $index_number + 1;
+
+fwrite($myfile, $added_number);
+fclose($myfile);
 
 ?>
 <!DOCTYPE html>
@@ -15,6 +30,7 @@ $image_url = '<img class="bg" src="'.$img_loc.'" />';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="refresh" content="20">
     <title>Kiosk images</title>
     <style>
         /*
