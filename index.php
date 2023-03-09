@@ -2,6 +2,8 @@
 $directory = "img";
 $all_img = array_slice(scandir($directory), 2);
 $array_length = count($all_img);
+$img_loc = "./default.jpg";
+if (!empty($all_img)){
 
 
 $myfile = fopen("number.txt", "r") or die("Unable to open file!");
@@ -13,7 +15,8 @@ if ($array_length == $index_number)
 fclose($myfile);
 
 $img_loc = "img/".$all_img[$index_number];
-$image_url = '<img class="bg" src="'.$img_loc.'" />';
+
+
 
 $myfile = fopen("number.txt", "w") or die("Unable to open file!");
 if ($array_length <= $index_number)
@@ -22,7 +25,8 @@ $added_number = $index_number + 1;
 
 fwrite($myfile, $added_number);
 fclose($myfile);
-
+}
+$image_url = '<img class="bg" src="'.$img_loc.'" />';
 ?>
 <!DOCTYPE html>
 <html lang="lt">
