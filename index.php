@@ -1,30 +1,29 @@
 <?php
+
 $directory = "img";
 $all_img = array_slice(scandir($directory), 2);
 $array_length = count($all_img);
 $img_loc = "./default.jpg";
 if (!empty($all_img)){
 
-
-$myfile = fopen("number.txt", "r") or die("Unable to open file!");
-$index_number = fread($myfile,2);
-if ($array_length < $index_number)
-    $index_number = 0;
-if ($array_length == $index_number)
-    $index_number = 0;
-fclose($myfile);
-
-$img_loc = "img/".$all_img[$index_number];
+  $cookie_name = "index";
+  $cookie_value = 0;
+  setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+  $in_num = $_COOKIE[$cookie_name];
+  if ($array_length < $in_num)
+    $in_num = 0;
+  if ($array_length == $in_num)
+    $in_num = 0;
 
 
 
-$myfile = fopen("number.txt", "w") or die("Unable to open file!");
-if ($array_length <= $index_number)
-    $index_number = -1;
-$added_number = $index_number + 1;
+$img_loc = "img/".$all_img[$in_num];
 
-fwrite($myfile, $added_number);
-fclose($myfile);
+if ($array_length <= $in_num)
+    $in_num = -1;
+$added_number = $in_num + 1;
+
+setcookie($cookie_name, $added_number, time() + (86400 * 30), "/"); // 86400 = 1 day
 }
 $image_url = '<img class="bg" src="'.$img_loc.'" />';
 ?>
