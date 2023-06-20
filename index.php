@@ -34,7 +34,7 @@ $image_url = '<img class="bg" src="' . $img_loc . '" />';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta http-equiv="refresh" content="20">
+  <meta http-equiv="refresh" content="15">
   <title>Kiosk images</title>
   <style>
     /*
