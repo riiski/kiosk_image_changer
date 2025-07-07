@@ -1,3 +1,4 @@
+
 <html lang="lt">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
@@ -73,18 +74,18 @@
         img.className = 'media';
         container.appendChild(img);
         mediaElements.push(img);
-      });
 
-      // Add video after images
-      const video = document.createElement('video');
-      video.className = 'media rotated';
-      video.muted = true;
-      const source = document.createElement('source');
-      source.src = 'video.mp4';
-      source.type = 'video/mp4';
-      video.appendChild(source);
-      container.appendChild(video);
-      mediaElements.push(video);
+        const video = document.createElement('video');
+        video.className = 'media rotated';
+        video.muted = true;
+        video.loop = false;
+        const source = document.createElement('source');
+        source.src = 'video.mp4';
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        container.appendChild(video);
+        mediaElements.push(video);
+      });
 
       showNextMedia();
     });
