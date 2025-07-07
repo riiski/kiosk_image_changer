@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="lt">
 <head>
@@ -18,7 +19,11 @@
       position: absolute;
       top: 0;
       left: 0;
-      display: none;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+    .visible {
+      opacity: 1;
     }
     .rotated {
       transform: translate(-50%, -50%) rotate(90deg);
@@ -44,16 +49,9 @@
   let mediaElements = [];
   let current = 0;
 
-  // Force preload of the hidden video
-  const preloadVideo = document.getElementById('preloadVideo');
-  preloadVideo.load();
-  preloadVideo.addEventListener('canplaythrough', () => {
-    console.log('Preload video is fully buffered and ready.');
-  });
-
   function showNextMedia() {
     mediaElements.forEach(el => {
-      el.style.display = 'none';
+      el.classList.remove('visible');
       if (el.tagName === 'VIDEO') {
         el.pause();
         el.currentTime = 0;
@@ -61,7 +59,7 @@
     });
 
     const currentEl = mediaElements[current];
-    currentEl.style.display = 'block';
+    currentEl.classList.add('visible');
 
     if (currentEl.tagName === 'VIDEO') {
       currentEl.play();
@@ -76,6 +74,12 @@
       }, 15000);
     }
   }
+
+  const preloadVideo = document.getElementById('preloadVideo');
+  preloadVideo.load();
+  preloadVideo.addEventListener('canplaythrough', () => {
+    console.log('Preload video is ready.');
+  });
 
   fetch('media.php')
     .then(response => response.json())
@@ -92,13 +96,14 @@
         video.muted = true;
         video.loop = false;
         video.preload = 'auto';
+        video.poster = 'poster.png';
         const source = document.createElement('source');
         source.src = 'video.mp4';
         source.type = 'video/mp4';
         video.appendChild(source);
-        video.load(); // Force preload
+        video.load();
         video.addEventListener('canplaythrough', () => {
-          console.log('Dynamic video is ready to play.');
+          console.log('Video is ready.');
         });
         container.appendChild(video);
         mediaElements.push(video);
