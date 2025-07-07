@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="lt">
 <head>
@@ -36,16 +35,21 @@
   <div id="slideshow-container"></div>
 
   <!-- Hidden preloaded video -->
-  <video id="preloadVideo" style="display:none;" preload="auto" muted>
+  <video id="preloadVideo" style="display:none;" preload="auto" muted poster="poster.jpg">
     <source src="video.mp4" type="video/mp4">
   </video>
 
 <script>
-
-
   const container = document.getElementById('slideshow-container');
   let mediaElements = [];
   let current = 0;
+
+  // Force preload of the hidden video
+  const preloadVideo = document.getElementById('preloadVideo');
+  preloadVideo.load();
+  preloadVideo.addEventListener('canplaythrough', () => {
+    console.log('Preload video is fully buffered and ready.');
+  });
 
   function showNextMedia() {
     mediaElements.forEach(el => {
@@ -69,7 +73,7 @@
       setTimeout(() => {
         current = (current + 1) % mediaElements.length;
         showNextMedia();
-      }, 15000); // 5 seconds for images
+      }, 15000);
     }
   }
 
@@ -83,7 +87,6 @@
         container.appendChild(img);
         mediaElements.push(img);
 
-        // Add a preloaded video after each image
         const video = document.createElement('video');
         video.className = 'media rotated';
         video.muted = true;
@@ -93,6 +96,10 @@
         source.src = 'video.mp4';
         source.type = 'video/mp4';
         video.appendChild(source);
+        video.load(); // Force preload
+        video.addEventListener('canplaythrough', () => {
+          console.log('Dynamic video is ready to play.');
+        });
         container.appendChild(video);
         mediaElements.push(video);
       });
