@@ -1,8 +1,9 @@
 
+<!DOCTYPE html>
 <html lang="lt">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kiosk Media</title>
   <style>
     body, html {
@@ -34,7 +35,14 @@
 <body>
   <div id="slideshow-container"></div>
 
+  <!-- Hidden preloaded video -->
+  <video id="preloadVideo" style="display:none;" preload="auto" muted>
+    <source src="video.mp4" type="video/mp4">
+  </video>
+
 <script>
+
+
   const container = document.getElementById('slideshow-container');
   let mediaElements = [];
   let current = 0;
@@ -61,7 +69,7 @@
       setTimeout(() => {
         current = (current + 1) % mediaElements.length;
         showNextMedia();
-      }, 5000); // 5 seconds for images
+      }, 15000); // 5 seconds for images
     }
   }
 
@@ -75,10 +83,12 @@
         container.appendChild(img);
         mediaElements.push(img);
 
+        // Add a preloaded video after each image
         const video = document.createElement('video');
         video.className = 'media rotated';
         video.muted = true;
         video.loop = false;
+        video.preload = 'auto';
         const source = document.createElement('source');
         source.src = 'video.mp4';
         source.type = 'video/mp4';
