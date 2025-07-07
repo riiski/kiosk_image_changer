@@ -60,7 +60,7 @@ setcookie($cookie_name, $next_index, time() + (86400 * 30), "/");
   <?php if ($current_media['type'] === 'image'): ?>
     <img class="bg" src="<?= $current_media['src'] ?>" />
   <?php else: ?>
-    <video class="bg rotated" autoplay muted loop>
+    <video class="bg rotated" autoplay muted loop preload="auto">
       <source src="<?= $current_media['src'] ?>" type="video/mp4">
       Your browser does not support the video tag.
     </video>
