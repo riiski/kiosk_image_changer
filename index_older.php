@@ -65,5 +65,6 @@ setcookie($cookie_name, $next_index, time() + (86400 * 30), "/");
       Your browser does not support the video tag.
     </video>
   <?php endif; ?>
+  
 </body>
 </html>

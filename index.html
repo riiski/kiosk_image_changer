@@ -1,0 +1,92 @@
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <title>Kiosk Media</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+    }
+    .media {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+    }
+    .rotated {
+      transform: translate(-50%, -50%) rotate(90deg);
+      transform-origin: center center;
+      width: 100vh;
+      height: 100vw;
+      top: 50%;
+      left: 50%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div id="slideshow-container"></div>
+
+<script>
+  const container = document.getElementById('slideshow-container');
+  let mediaElements = [];
+  let current = 0;
+
+  function showNextMedia() {
+    mediaElements.forEach(el => {
+      el.style.display = 'none';
+      if (el.tagName === 'VIDEO') {
+        el.pause();
+        el.currentTime = 0;
+      }
+    });
+
+    const currentEl = mediaElements[current];
+    currentEl.style.display = 'block';
+
+    if (currentEl.tagName === 'VIDEO') {
+      currentEl.play();
+      currentEl.onended = () => {
+        current = (current + 1) % mediaElements.length;
+        showNextMedia();
+      };
+    } else {
+      setTimeout(() => {
+        current = (current + 1) % mediaElements.length;
+        showNextMedia();
+      }, 5000); // 5 seconds for images
+    }
+  }
+
+  fetch('media.php')
+    .then(response => response.json())
+    .then(images => {
+      images.forEach(src => {
+        const img = document.createElement('img');
+        img.src = 'img/' + src;
+        img.className = 'media';
+        container.appendChild(img);
+        mediaElements.push(img);
+      });
+
+      // Add video after images
+      const video = document.createElement('video');
+      video.className = 'media rotated';
+      video.muted = true;
+      const source = document.createElement('source');
+      source.src = 'video.mp4';
+      source.type = 'video/mp4';
+      video.appendChild(source);
+      container.appendChild(video);
+      mediaElements.push(video);
+
+      showNextMedia();
+    });
+</script>
+</body>
+</html>
