@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html lang="lt">
@@ -48,8 +49,10 @@
     if (currentEl.tagName === 'VIDEO') {
       currentEl.play();
       currentEl.onended = () => {
-        current = (current + 1) % mediaElements.length;
-        showNextMedia();
+        setTimeout(() => {
+          current = (current + 1) % mediaElements.length;
+          showNextMedia();
+        }, 2000);
       };
     } else {
       setTimeout(() => {
@@ -78,7 +81,6 @@
         video.muted = true;
         video.loop = false;
         video.preload = 'auto';
-        //video.poster = 'poster.png';
         const source = document.createElement('source');
         source.src = 'video.mp4';
         source.type = 'video/mp4';
