@@ -26,9 +26,7 @@
 <body>
 <div id="slideshow-container"></div>
 <!-- Hidden preloaded video -->
-<video id="preloadVideo" muted="" preload="auto" style="display:none;">
-<source src="video.mp4" type="video/mp4"/>
-</video>
+
 <script>
   const container = document.getElementById('slideshow-container');
   let mediaElements = [];
@@ -52,7 +50,7 @@
         setTimeout(() => {
           current = (current + 1) % mediaElements.length;
           showNextMedia();
-        }, 2000);
+        }, 3000);
       };
     } else {
       setTimeout(() => {
@@ -61,10 +59,6 @@
       }, 15000);
     }
   }
-
-  const preloadVideo = document.getElementById('preloadVideo');
-  preloadVideo.load();
-  preloadVideo.addEventListener('canplaythrough', () => {});
 
   fetch('media.php')
     .then(response => response.json())
@@ -80,13 +74,10 @@
         video.className = 'media';
         video.muted = true;
         video.loop = false;
-        video.preload = 'auto';
         const source = document.createElement('source');
         source.src = 'video.mp4';
         source.type = 'video/mp4';
         video.appendChild(source);
-        video.load();
-        video.addEventListener('canplaythrough', () => {});
         container.appendChild(video);
         mediaElements.push(video);
       });
