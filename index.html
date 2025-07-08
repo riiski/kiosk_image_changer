@@ -62,9 +62,7 @@
 
   const preloadVideo = document.getElementById('preloadVideo');
   preloadVideo.load();
-  preloadVideo.addEventListener('canplaythrough', () => {
-    console.log('Preload video is ready.');
-  });
+  preloadVideo.addEventListener('canplaythrough', () => {});
 
   fetch('media.php')
     .then(response => response.json())
@@ -87,9 +85,7 @@
         source.type = 'video/mp4';
         video.appendChild(source);
         video.load();
-        video.addEventListener('canplaythrough', () => {
-          console.log('Video is ready.');
-        });
+        video.addEventListener('canplaythrough', () => {});
         container.appendChild(video);
         mediaElements.push(video);
       });
