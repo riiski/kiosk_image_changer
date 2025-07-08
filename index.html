@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="lt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kiosk Media</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Kiosk Media</title>
+<style>
     body, html {
       margin: 0;
       padding: 0;
@@ -22,13 +23,11 @@
   </style>
 </head>
 <body>
-  <div id="slideshow-container"></div>
-
-  <!-- Hidden preloaded video -->
-  <video id="preloadVideo" style="display:none;" preload="auto" muted poster="poster.jpg">
-    <source src="video.mp4" type="video/mp4">
-  </video>
-
+<div id="slideshow-container"></div>
+<!-- Hidden preloaded video -->
+<video id="preloadVideo" muted="" preload="auto" style="display:none;">
+<source src="video.mp4" type="video/mp4"/>
+</video>
 <script>
   const container = document.getElementById('slideshow-container');
   let mediaElements = [];
