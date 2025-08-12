@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Kiosk Media</title>
-<style>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>Kiosk Media</title>
+  <style>
     body, html {
       margin: 0;
       padding: 0;
@@ -18,77 +18,72 @@
       position: absolute;
       top: 0;
       left: 0;
+      display: none;
     }
-</style>
+  </style>
 </head>
 <body>
-<div id="slideshow-container"></div>
+  <div id="slideshow-container"></div>
 
-<script>
-  const container = document.getElementById('slideshow-container');
-  let mediaElements = [];
-  let current = 0;
+  <script>
+    const container = document.getElementById('slideshow-container');
+    let mediaElements = [];
+    let current = 0;
 
-  function showNextMedia() {
-    mediaElements.forEach(el => {
-      el.style.display = 'none';
-      if (el.tagName === 'VIDEO') {
-        el.pause();
-        el.currentTime = 0;
-        el.removeAttribute('src');
-        while (el.firstChild) {
-          el.removeChild(el.firstChild);
+    function showNextMedia() {
+      mediaElements.forEach(el => {
+        el.style.display = 'none';
+        if (el.tagName === 'VIDEO') {
+          el.pause();
+          el.currentTime = 0;
         }
-        el.load();
-      }
-    });
+      });
 
-    const currentEl = mediaElements[current];
-
-    if (currentEl.tagName === 'VIDEO') {
-      const source = document.createElement('source');
-      source.src = 'video.mp4';
-      source.type = 'video/mp4';
-      currentEl.appendChild(source);
-      currentEl.load();
-
+      const currentEl = mediaElements[current];
       currentEl.style.display = 'block';
-      currentEl.play();
-      currentEl.onended = () => {
+
+      if (currentEl.tagName === 'VIDEO') {
+        currentEl.play();
+        currentEl.onended = () => {
+          current = (current + 1) % mediaElements.length;
+          showNextMedia();
+        };
+      } else {
         setTimeout(() => {
           current = (current + 1) % mediaElements.length;
           showNextMedia();
-        }, 3000);
-      };
-    } else {
-      currentEl.style.display = 'block';
-      setTimeout(() => {
-        current = (current + 1) % mediaElements.length;
-        showNextMedia();
-      }, 15000);
+        }, 15000); // Show image for 15 seconds
+      }
     }
-  }
 
-  fetch('media.php')
-    .then(response => response.json())
-    .then(images => {
-      images.forEach(src => {
-        const img = document.createElement('img');
-        img.src = 'img/' + src;
-        img.className = 'media';
-        container.appendChild(img);
-        mediaElements.push(img);
+    fetch('media.php')
+      .then(response => response.json())
+      .then(files => {
+        files.forEach(file => {
+          const ext = file.split('.').pop().toLowerCase();
+          let el;
 
-        const video = document.createElement('video');
-        video.className = 'media';
-        video.muted = true;
-        video.loop = false;
-        container.appendChild(video);
-        mediaElements.push(video);
+          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+            el = document.createElement('img');
+            el.src = 'img/' + file;
+          } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+            el = document.createElement('video');
+            el.src = 'img/' + file;
+            el.muted = true;
+            el.loop = false;
+          }
+
+          if (el) {
+            el.className = 'media';
+            container.appendChild(el);
+            mediaElements.push(el);
+          }
+        });
+
+        if (mediaElements.length > 0) {
+          showNextMedia();
+        }
       });
-
-      showNextMedia();
-    });
-</script>
+  </script>
 </body>
 </html>
