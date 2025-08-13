@@ -1,89 +1,136 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>Kiosk Media</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: black;
-    }
-    .media {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Kiosk Media</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: black;
+  }
+  .media {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
 </head>
 <body>
-  <div id="slideshow-container"></div>
+<div id="slideshow-container"></div>
 
-  <script>
-    const container = document.getElementById('slideshow-container');
-    let mediaElements = [];
-    let current = 0;
+<script>
+  const container = document.getElementById('slideshow-container');
+  const videoFiles = ['video.mp4', 'video2.mp4', 'video3.mp4']; // <-- 3 video failai
+  let mediaElements = [];
+  let current = 0;
 
-    function showNextMedia() {
-      mediaElements.forEach(el => {
-        el.style.display = 'none';
-        if (el.tagName === 'VIDEO') {
-          el.pause();
-          el.currentTime = 0;
+  function showNextMedia() {
+    // Paslėpti ir išvalyti visus elementus prieš rodant kitą
+    mediaElements.forEach(el => {
+      el.style.display = 'none';
+      if (el.tagName === 'VIDEO') {
+        el.pause();
+        el.currentTime = 0;
+        // nuimame šaltinius, kad išvengtume atminties nutekėjimų
+        el.removeAttribute('src');
+        while (el.firstChild) {
+          el.removeChild(el.firstChild);
         }
-      });
+        el.load();
+        el.onended = null;
+        el.onerror = null;
+      }
+    });
 
-      const currentEl = mediaElements[current];
+    const currentEl = mediaElements[current];
+
+    if (currentEl.tagName === 'VIDEO') {
+      // Paimame dinaminį video šaltinį
+      const file = currentEl.dataset.src || videoFiles[0];
+
+      const source = document.createElement('source');
+      source.src = file;
+      source.type = 'video/mp4';
+      currentEl.appendChild(source);
+      currentEl.load();
+
       currentEl.style.display = 'block';
-
-      if (currentEl.tagName === 'VIDEO') {
-        currentEl.play();
-        currentEl.onended = () => {
-          current = (current + 1) % mediaElements.length;
-          showNextMedia();
-        };
-      } else {
+      currentEl.play().catch(() => {
+        // jei naršyklė sulaikė autoplay ar nepavyko paleisti, pereiname prie kito po trumpos pauzės
         setTimeout(() => {
           current = (current + 1) % mediaElements.length;
           showNextMedia();
-        }, 15000); // Show image for 15 seconds
-      }
-    }
-
-    fetch('media.php')
-      .then(response => response.json())
-      .then(files => {
-        files.forEach(file => {
-          const ext = file.split('.').pop().toLowerCase();
-          let el;
-
-          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
-            el = document.createElement('img');
-            el.src = 'img/' + file;
-          } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
-            el = document.createElement('video');
-            el.src = 'img/' + file;
-            el.muted = true;
-            el.loop = false;
-          }
-
-          if (el) {
-            el.className = 'media';
-            container.appendChild(el);
-            mediaElements.push(el);
-          }
-        });
-
-        if (mediaElements.length > 0) {
-          showNextMedia();
-        }
+        }, 1000);
       });
-  </script>
+
+      // Po video pabaigos – 3s pauzė ir toliau
+      currentEl.onended = () => {
+        setTimeout(() => {
+          current = (current + 1) % mediaElements.length;
+          showNextMedia();
+        }, 3000);
+      };
+
+      // Jei video failas nesikrauna, praleidžiame jį
+      currentEl.onerror = () => {
+        console.warn('Nepavyko užkrauti video:', file);
+        setTimeout(() => {
+          current = (current + 1) % mediaElements.length;
+          showNextMedia();
+        }, 1000);
+      };
+    } else {
+      // Paveikslas rodomas 15s
+      currentEl.style.display = 'block';
+      setTimeout(() => {
+        current = (current + 1) % mediaElements.length;
+        showNextMedia();
+      }, 15000);
+    }
+  }
+
+  // Užkrauname paveikslų sąrašą iš media.php (turi grąžinti JSON masyvą, pvz. ["a.jpg","b.png"])
+  fetch('media.php')
+    .then(response => response.json())
+    .then(images => {
+      images.forEach((src, idx) => {
+        // IMG
+        const img = document.createElement('img');
+        img.src = 'img/' + src;
+        img.className = 'media';
+        img.style.display = 'none';
+        container.appendChild(img);
+        mediaElements.push(img);
+
+        // VIDEO (kaitaliojame tarp trijų failų)
+        const video = document.createElement('video');
+        video.className = 'media';
+        video.muted = true;
+        video.loop = false;
+        video.playsInline = true;                 // iOS / mobilieji
+        video.setAttribute('webkit-playsinline', '');
+        video.style.display = 'none';
+
+        // čia – 3-iasis video failas per masyvą (idx % 3)
+        video.dataset.src = videoFiles[idx % videoFiles.length];
+
+        container.appendChild(video);
+        mediaElements.push(video);
+      });
+
+      if (mediaElements.length > 0) {
+        showNextMedia();
+      }
+    })
+    .catch(err => {
+      console.error('Nepavyko užkrauti sąrašo iš media.php:', err);
+    });
+</script>
 </body>
 </html>
