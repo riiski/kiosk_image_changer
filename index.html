@@ -26,18 +26,16 @@
 
 <script>
   const container = document.getElementById('slideshow-container');
-  const videoFiles = ['video.mp4', 'video2.mp4', 'video3.mp4']; // <-- 3 video failai
+  const videoFiles = ['video.mp4', 'video2.mp4', 'video3.mp4'];
   let mediaElements = [];
   let current = 0;
 
   function showNextMedia() {
-    // Paslėpti ir išvalyti visus elementus prieš rodant kitą
     mediaElements.forEach(el => {
       el.style.display = 'none';
       if (el.tagName === 'VIDEO') {
         el.pause();
         el.currentTime = 0;
-        // nuimame šaltinius, kad išvengtume atminties nutekėjimų
         el.removeAttribute('src');
         while (el.firstChild) {
           el.removeChild(el.firstChild);
@@ -51,8 +49,7 @@
     const currentEl = mediaElements[current];
 
     if (currentEl.tagName === 'VIDEO') {
-      // Paimame dinaminį video šaltinį
-      const file = currentEl.dataset.src || videoFiles[0];
+      const file = currentEl.dataset.src;
 
       const source = document.createElement('source');
       source.src = file;
@@ -62,14 +59,12 @@
 
       currentEl.style.display = 'block';
       currentEl.play().catch(() => {
-        // jei naršyklė sulaikė autoplay ar nepavyko paleisti, pereiname prie kito po trumpos pauzės
         setTimeout(() => {
           current = (current + 1) % mediaElements.length;
           showNextMedia();
         }, 1000);
       });
 
-      // Po video pabaigos – 3s pauzė ir toliau
       currentEl.onended = () => {
         setTimeout(() => {
           current = (current + 1) % mediaElements.length;
@@ -77,7 +72,6 @@
         }, 3000);
       };
 
-      // Jei video failas nesikrauna, praleidžiame jį
       currentEl.onerror = () => {
         console.warn('Nepavyko užkrauti video:', file);
         setTimeout(() => {
@@ -86,7 +80,6 @@
         }, 1000);
       };
     } else {
-      // Paveikslas rodomas 15s
       currentEl.style.display = 'block';
       setTimeout(() => {
         current = (current + 1) % mediaElements.length;
@@ -95,31 +88,28 @@
     }
   }
 
-  // Užkrauname paveikslų sąrašą iš media.php (turi grąžinti JSON masyvą, pvz. ["a.jpg","b.png"])
   fetch('media.php')
     .then(response => response.json())
     .then(images => {
-      images.forEach((src, idx) => {
-        // IMG
+      images.forEach(src => {
         const img = document.createElement('img');
         img.src = 'img/' + src;
         img.className = 'media';
         img.style.display = 'none';
         container.appendChild(img);
         mediaElements.push(img);
+      });
 
-        // VIDEO (kaitaliojame tarp trijų failų)
+      // Add all videos explicitly
+      videoFiles.forEach(file => {
         const video = document.createElement('video');
         video.className = 'media';
         video.muted = true;
         video.loop = false;
-        video.playsInline = true;                 // iOS / mobilieji
+        video.playsInline = true;
         video.setAttribute('webkit-playsinline', '');
         video.style.display = 'none';
-
-        // čia – 3-iasis video failas per masyvą (idx % 3)
-        video.dataset.src = videoFiles[idx % videoFiles.length];
-
+        video.dataset.src = file;
         container.appendChild(video);
         mediaElements.push(video);
       });
@@ -132,5 +122,6 @@
       console.error('Nepavyko užkrauti sąrašo iš media.php:', err);
     });
 </script>
+
 </body>
 </html>
